@@ -1,5 +1,5 @@
 # Name of your workflow
-name: Build Docker Image
+name: Build and Scan Docker Image
 
 # Trigger the workflow on every push to the main branch
 on:
@@ -8,7 +8,7 @@ on:
 
 # A job is a set of steps that execute on a virtual machine
 jobs:
-  build:
+  build-and-scan:
     # The type of virtual machine to run the job on
     runs-on: ubuntu-latest
 
@@ -20,4 +20,12 @@ jobs:
 
       # Step 2: Build the Docker image
       - name: Build the Docker image
-        run: docker build -t my-flask-app .
+        run: docker build -t my-flask-app:latest .
+
+      # Step 3: NEW - Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'my-flask-app:latest'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
